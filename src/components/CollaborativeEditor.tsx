@@ -1,16 +1,5 @@
 import { useEditor, EditorContent } from '@tiptap/react'
-import Document from '@tiptap/extension-document'
-import Paragraph from '@tiptap/extension-paragraph'
-import Text from '@tiptap/extension-text'
-import Bold from '@tiptap/extension-bold'
-import Italic from '@tiptap/extension-italic'
-import Strike from '@tiptap/extension-strike'
-import Code from '@tiptap/extension-code'
-import Heading from '@tiptap/extension-heading'
-import BulletList from '@tiptap/extension-bullet-list'
-import OrderedList from '@tiptap/extension-ordered-list'
-import ListItem from '@tiptap/extension-list-item'
-import Blockquote from '@tiptap/extension-blockquote'
+import StarterKit from '@tiptap/starter-kit'
 import Collaboration from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import * as Y from 'yjs'
@@ -30,6 +19,11 @@ const getRandomUser = () => {
     name: names[index],
     color: colors[index]
   }
+}
+
+interface User {
+  name: string
+  color: string
 }
 
 const Toolbar = ({ editor }: { editor: any }) => {
@@ -117,93 +111,92 @@ const Toolbar = ({ editor }: { editor: any }) => {
 }
 
 export const CollaborativeEditor = () => {
-  const [currentUser] = useState(getRandomUser)
-  const [users, setUsers] = useState<any[]>([])
+  const [currentUser] = useState<User>(getRandomUser)
+  const [users, setUsers] = useState<User[]>([])
   const [provider, setProvider] = useState<WebsocketProvider | null>(null)
   
   const ydoc = useMemo(() => new Y.Doc(), [])
 
   useEffect(() => {
-    const p = new WebsocketProvider(
-      'ws://localhost:1234',
-      'tiptap-collaboration-demo',
-      ydoc
-    )
+    console.log('[SyncEdit] Hook: Initializing WebsocketProvider...')
+    try {
+      const p = new WebsocketProvider(
+        'ws://localhost:1234',
+        'tiptap-collaboration-demo',
+        ydoc
+      )
 
-    p.awareness.setLocalStateField('user', {
-      name: currentUser.name,
-      color: currentUser.color,
-    })
+      p.on('status', (event: { status: string }) => {
+        console.log('[SyncEdit] Websocket status:', event.status)
+      })
 
-    p.awareness.on('change', () => {
-      setUsers(Array.from(p.awareness.getStates().values()).map((s: any) => s.user).filter(Boolean))
-    })
+      p.awareness.setLocalStateField('user', {
+        name: currentUser.name,
+        color: currentUser.color,
+      })
 
-    setProvider(p)
+      p.awareness.on('change', () => {
+        const states = Array.from(p.awareness.getStates().values()) as any[]
+        const activeUsers = states
+          .map(s => s.user)
+          .filter((user): user is User => !!(user && user.name))
+        setUsers(activeUsers)
+      })
 
-    return () => {
-      p.destroy()
-      ydoc.destroy()
+      setProvider(p)
+
+      return () => {
+        console.log('[SyncEdit] Hook: Cleaning up...')
+        p.destroy()
+        ydoc.destroy()
+      }
+    } catch (err) {
+      console.error('[SyncEdit] Error in useEffect:', err)
     }
   }, [ydoc, currentUser])
 
   const editor = useEditor({
     extensions: [
-      Document,
-      Paragraph,
-      Text,
-      Bold,
-      Italic,
-      Strike,
-      Code,
-      Heading.configure({ levels: [1, 2, 3] }),
-      BulletList,
-      OrderedList,
-      ListItem,
-      Blockquote,
+      StarterKit.configure({
+        history: false,
+      }) as any,
       Collaboration.configure({
         document: ydoc,
       }),
       provider ? CollaborationCursor.configure({
         provider: provider,
-        user: currentUser,
+        user: {
+          name: currentUser.name,
+          color: currentUser.color,
+        },
       }) : null,
     ].filter(Boolean) as any,
+    onBeforeCreate: () => console.log('[SyncEdit] Editor about to be created...'),
+    onCreate: () => console.log('[SyncEdit] Editor created!'),
+    onUpdate: () => console.log('[SyncEdit] Editor update'),
   }, [provider])
 
-  if (!editor || !provider) {
-    return (
-      <div className="app-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Loader2 className="animate-spin" size={48} color="rgba(255,255,255,0.2)" />
-      </div>
-    )
-  }
+  console.log('[SyncEdit] Render: editor=', !!editor, 'provider=', !!provider)
 
   return (
-    <div className="app-container">
-      <header className="header">
-        <div className="title-section">
-          <h1>SyncEdit</h1>
-        </div>
-        <div className="presence-list">
-          {users.map((user, i) => (
-            <div 
-              key={i} 
-              className="avatar" 
-              style={{ backgroundColor: user.color }}
-              title={user.name}
-            >
-              {user.name[0]}
-            </div>
-          ))}
-        </div>
-      </header>
-
-      <Toolbar editor={editor} />
-
-      <div className="editor-wrapper">
-        <EditorContent editor={editor} />
-      </div>
+    <div className="app-container" style={{ padding: '2rem', color: 'white' }}>
+      <h1>SyncEdit Debug Mode</h1>
+      {!provider && <p>Waiting for provider...</p>}
+      {provider && !editor && <p>Waiting for editor...</p>}
+      {editor && (
+        <>
+          <div className="presence-list" style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem' }}>
+            {users.map((user, i) => (
+              <div key={i} style={{ backgroundColor: user.color, padding: '0.25rem 0.5rem', borderRadius: '4px' }}>
+                {user.name}
+              </div>
+            ))}
+          </div>
+          <div className="editor-wrapper" style={{ border: '1px solid #333', padding: '1rem' }}>
+            <EditorContent editor={editor} />
+          </div>
+        </>
+      )}
     </div>
   )
 }
