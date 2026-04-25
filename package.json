@@ -1,0 +1,50 @@
+{
+  "name": "real-time-editor",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "server": "node server.cjs",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tiptap/core": "^3.22.4",
+    "@tiptap/extension-blockquote": "^3.22.4",
+    "@tiptap/extension-bold": "^3.22.4",
+    "@tiptap/extension-bullet-list": "^3.22.4",
+    "@tiptap/extension-code": "^3.22.4",
+    "@tiptap/extension-collaboration": "^3.22.4",
+    "@tiptap/extension-collaboration-cursor": "^2.26.2",
+    "@tiptap/extension-document": "^3.22.4",
+    "@tiptap/extension-heading": "^3.22.4",
+    "@tiptap/extension-italic": "^3.22.4",
+    "@tiptap/extension-list": "^3.22.4",
+    "@tiptap/extension-list-item": "^3.22.4",
+    "@tiptap/extension-ordered-list": "^3.22.4",
+    "@tiptap/extension-paragraph": "^3.22.4",
+    "@tiptap/extension-strike": "^3.22.4",
+    "@tiptap/extension-text": "^3.22.4",
+    "@tiptap/pm": "^3.22.4",
+    "@tiptap/react": "^3.22.4",
+    "@tiptap/starter-kit": "^3.22.4",
+    "@tiptap/y-tiptap": "^3.0.3",
+    "lucide-react": "0.468.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "ws": "8.18.0",
+    "y-prosemirror": "1.2.11",
+    "y-websocket": "1.5.0",
+    "yjs": "13.6.10"
+  },
+  "devDependencies": {
+    "@types/node": "20.12.7",
+    "@types/react": "18.2.66",
+    "@types/react-dom": "18.2.22",
+    "@vitejs/plugin-react": "4.2.1",
+    "typescript": "5.2.2",
+    "vite": "5.2.8"
+  }
+}
