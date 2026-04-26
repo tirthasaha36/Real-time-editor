@@ -137,18 +137,87 @@ body {
   position: relative;
 }
 
-.tiptap {
-  outline: none;
-  font-size: 1.125rem;
-  min-height: 100%;
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.tiptap p.is-editor-empty:first-child::before {
+.toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.toolbar-btn.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.toolbar-btn.small {
+  width: 28px;
+  height: 28px;
+}
+
+.ProseMirror {
+  outline: none;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
   color: rgba(255, 255, 255, 0.2);
   pointer-events: none;
   height: 0;
+}
+
+.ProseMirror h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+.ProseMirror h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.ProseMirror blockquote {
+  border-left: 3px solid rgba(255, 255, 255, 0.2);
+  padding-left: 1.5rem;
+  margin-left: 0;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ProseMirror code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 /* Collaborative Cursors */
